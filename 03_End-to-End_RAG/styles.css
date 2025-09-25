@@ -245,14 +245,6 @@ footer {
     font-size: 14px;
 }
 
-.query-display {
-    margin-bottom: 15px;
-    padding: 10px;
-    background: #f0f4f8;
-    border-radius: 8px;
-    border-left: 3px solid #667eea;
-}
-
 .response-display {
     margin-bottom: 15px;
 }

@@ -59,11 +59,7 @@ function showResults(response, query) {
     
     // Display results
     resultContent.innerHTML = `
-        <div class="query-display">
-            <strong>Your question:</strong> "${query}"
-        </div>
         <div class="response-display">
-            <strong>Answer:</strong><br>
             ${response}
         </div>
         <div class="demo-notice">
