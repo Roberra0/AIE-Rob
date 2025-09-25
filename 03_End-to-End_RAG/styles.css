@@ -225,44 +225,6 @@ footer {
     transition: all 0.3s ease;
 }
 
-/* Examples section */
-.examples-container {
-    margin-top: 30px;
-    padding-top: 30px;
-    border-top: 1px solid #e1e5e9;
-}
-
-.examples-container h3 {
-    color: #666;
-    font-size: 1rem;
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-.example-queries {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-}
-
-.example-btn {
-    background: #f8f9fa;
-    border: 1px solid #e1e5e9;
-    border-radius: 20px;
-    padding: 8px 16px;
-    font-size: 14px;
-    color: #666;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.example-btn:hover {
-    background: #667eea;
-    color: white;
-    border-color: #667eea;
-    transform: translateY(-1px);
-}
 
 /* Error and demo notices */
 .error-message {

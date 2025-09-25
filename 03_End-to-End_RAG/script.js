@@ -5,16 +5,8 @@ const resultsSection = document.getElementById('resultsSection');
 const resultContent = document.getElementById('resultContent');
 const loading = document.getElementById('loading');
 
-// Sample responses for demo purposes
-const sampleResponses = [
-    "Based on the available listings, I found several apartments under $3000. The Berkeley Place has 1-bedroom units starting at $2,950/month, and there are options at 2067 University Ave with various sizes and amenities.",
-    
-    "I found multiple 2-bedroom apartments available. The Kittredge building has 2-bedroom, 2-bathroom units at $4,000/month, and there are several other options in the Berkeley area with different price points and features.",
-    
-    "For pet-friendly apartments, I can see several options that allow both cats and dogs. Most listings include pet policies with additional fees, typically around $150-200 per month for pets.",
-    
-    "The listings show various amenities including in-unit washer & dryer, stainless steel appliances, high-speed internet, and some buildings offer parking spaces. Many are located within walking distance of UC Berkeley campus."
-];
+// Simple demo response
+const demoResponse = "I found several apartment options that match your criteria. The listings include various sizes, price points, and amenities. Would you like me to provide more specific details about any particular aspect, such as location, price range, or features?";
 
 // Event listeners
 searchBtn.addEventListener('click', handleSearch);
@@ -45,21 +37,7 @@ function handleSearch() {
 
 // Generate a response based on the query
 function generateResponse(query) {
-    const lowerQuery = query.toLowerCase();
-    
-    // Simple keyword matching for demo
-    if (lowerQuery.includes('3000') || lowerQuery.includes('under') || lowerQuery.includes('cheap')) {
-        return sampleResponses[0];
-    } else if (lowerQuery.includes('2') && (lowerQuery.includes('bedroom') || lowerQuery.includes('bed'))) {
-        return sampleResponses[1];
-    } else if (lowerQuery.includes('pet') || lowerQuery.includes('dog') || lowerQuery.includes('cat')) {
-        return sampleResponses[2];
-    } else if (lowerQuery.includes('amenit') || lowerQuery.includes('feature') || lowerQuery.includes('include')) {
-        return sampleResponses[3];
-    } else {
-        // Default response
-        return "I found several apartment options that match your criteria. The listings include various sizes, price points, and amenities. Would you like me to provide more specific details about any particular aspect, such as location, price range, or features?";
-    }
+    return demoResponse;
 }
 
 // Show loading state
@@ -130,33 +108,3 @@ queryInput.addEventListener('blur', function() {
     this.parentElement.style.transform = 'scale(1)';
 });
 
-// Add some example queries
-const exampleQueries = [
-    "What apartments are available for under $3000?",
-    "Show me 2 bedroom apartments",
-    "Are there any pet-friendly apartments?",
-    "What amenities are included?"
-];
-
-// Add example queries to the page
-document.addEventListener('DOMContentLoaded', function() {
-    const examplesContainer = document.createElement('div');
-    examplesContainer.className = 'examples-container';
-    examplesContainer.innerHTML = `
-        <h3>Try these example questions:</h3>
-        <div class="example-queries">
-            ${exampleQueries.map(query => 
-                `<button class="example-btn" onclick="fillQuery('${query}')">${query}</button>`
-            ).join('')}
-        </div>
-    `;
-    
-    const searchSection = document.querySelector('.search-section');
-    searchSection.appendChild(examplesContainer);
-});
-
-// Function to fill query from examples
-function fillQuery(query) {
-    queryInput.value = query;
-    queryInput.focus();
-}
