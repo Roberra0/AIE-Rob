@@ -16,8 +16,6 @@ from aimakerspace.openai_utils.prompts import (
 )
 from aimakerspace.openai_utils.chatmodel import ChatOpenAI
 
-
-
 # Helps determine how close two vectors are to each other  
 def cosine_similarity(vec_1, vec_2):
   return np.dot(vec_1, vec_2) / (norm(vec_1) * norm(vec_2))
@@ -31,7 +29,6 @@ with open('.env', 'r') as f:
 
 # Set up the embedding model
 embedding_model = EmbeddingModel()
-
 
 
 ### TEST
@@ -57,10 +54,10 @@ embedding_model = EmbeddingModel()
 
 
 ### Load the file
-text_loader = TextFileLoader("data/random_book.txt") # TextFileLoader is a class that loads text files
+text_loader = TextFileLoader("data/rental_listings.pdf") # TextFileLoader is a class that loads text files
 documents = text_loader.load_documents() # Load the documents from the text file
 len(documents)
-print("First document 10 chars:", documents[0][:10]) # For the first document [0], print the first 100 characters :100 
+# print("First document 10 chars:", documents[0][:10]) # For the first document [0], print the first 100 characters :100 
 
 ### Split the documents into chunks
 text_splitter = CharacterTextSplitter()
@@ -74,10 +71,10 @@ split_documents = text_splitter.split_texts(documents)
 vector_db = VectorDatabase()
 vector_db = asyncio.run(vector_db.abuild_from_list(split_documents))
 
-# Query the vector database
+# TEST Query the vector database test
 # Embeds our query witht he same ebedding model, and loops through every vector in the DB and calculates cosine similarity to return top k closest vectors
-query = "What is it important to know in any research work?"
-result = vector_db.search_by_text("What is it important to know in any research work?", k=3)
+# query = "Are there any 2 bedroom 1bathroom apartments that are ~800 sqft?"
+# result = vector_db.search_by_text(query, k=3)
 # print(query, "\n", result)
 
 
@@ -89,7 +86,7 @@ result = vector_db.search_by_text("What is it important to know in any research 
 
 
 ### TEST Chat
-chat_openai = ChatOpenAI() 
+# chat_openai = ChatOpenAI() 
 # user_prompt_template = "{content}"
 # system_prompt_template = (
 #     "You are an expert in {expertise}, you always answer in a kind way." 
@@ -108,7 +105,7 @@ chat_openai = ChatOpenAI()
 # print(response)
 
 
-RAG_SYSTEM_TEMPLATE = """You are a knowledgeable assistant that answers questions based strictly on provided context.
+RAG_SYSTEM_TEMPLATE = """You are a knowledgeable real estate agent that answers questions based strictly on provided context, you are aiding user in finding an apartment.
 
 Instructions:
 - Only answer questions using information from the provided context
@@ -116,7 +113,8 @@ Instructions:
 - Be accurate and cite specific parts of the context when possible
 - Keep responses {response_style} and {response_length}
 - Only use the provided context. Do not use external knowledge.
-- Only provide answers when you are confident the context supports your response."""
+- Only provide answers when you are confident the context supports your response.
+- Be kind and warm, you're trying to help the user find their dream home"""
 
 RAG_USER_TEMPLATE = """Context Information:
 {context}
@@ -183,6 +181,7 @@ class RetrievalAugmentedQAPipeline:
         formatted_user_prompt = rag_user_prompt.create_message(**user_params)
 
         return {
+            "query": user_query,
             "response": self.llm.run([formatted_system_prompt, formatted_user_prompt]), 
             "context": context_list,
             "context_count": len(context_list),
@@ -194,22 +193,47 @@ class RetrievalAugmentedQAPipeline:
         }
 
 
-### TEST RAG Pipeline
-rag_pipeline = RetrievalAugmentedQAPipeline(
-    vector_db_retriever=vector_db,
-    llm=chat_openai,
-    response_style="detailed",
-    include_scores=True
-)
+def main():
+    """Main function to run the RAG pipeline"""
+    # Initialize components
+    chat_openai = ChatOpenAI() 
+    rag_pipeline = RetrievalAugmentedQAPipeline(
+        vector_db_retriever=vector_db,
+        llm=chat_openai,
+        response_style="detailed",
+        include_scores=True
+    )
 
-result = rag_pipeline.run_pipeline(
-    "What is is something important to know in any research work?",
-    k=3,
-    response_length="comprehensive", 
-    include_warnings=True,
-    confidence_required=True
-)
+    # Example query
+    query = "What apartments are available that are $4,000?"
+    
+    # Run the pipeline
+    result = rag_pipeline.run_pipeline(
+        query,
+        k=3,
+        response_length="comprehensive", 
+        response_style="detailed",
+        include_warnings=True,
+        confidence_required=True
+    )
 
-print(f"Response: {result['response']}")
-print(f"\nContext Count: {result['context_count']}")
-print(f"Similarity Scores: {result['similarity_scores']}")
+    # Display results
+    print(f"🔍 QUERY: {result.get('query', 'No query found')}")
+    print(f"\n💬 Response: {result['response']}")
+    print(f"\n📊 Context Count: {result['context_count']}")
+    print(f"📈 Similarity Scores: {result['similarity_scores']}")
+
+    print(f"\n{'='*80}")
+    print("CONTEXT SOURCES:")
+    print(f"{'='*80}")
+
+    for i, (context, score) in enumerate(result['context'], 1):
+        print(f"\n📊 SIMILARITY SCORE: {score:.3f}")
+        print(f"📄 SOURCE {i}:")
+        print(f"{'─'*60}")
+        print(f"{context[:800]}...")  # First 800 chars to see more of the chunk
+        print(f"{'─'*60}")
+        print()  # Extra blank line for separation
+
+if __name__ == "__main__": # Calls the main function only when the script is run directly, not when imported as a module
+    main()
