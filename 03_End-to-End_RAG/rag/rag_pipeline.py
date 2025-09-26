@@ -20,6 +20,8 @@ from aimakerspace.openai_utils.prompts import (
 )
 from aimakerspace.openai_utils.chatmodel import ChatOpenAI
 
+nest_asyncio.apply()
+
 # Helps determine how close two vectors are to each other  
 def cosine_similarity(vec_1, vec_2):
   return np.dot(vec_1, vec_2) / (norm(vec_1) * norm(vec_2))
@@ -70,7 +72,16 @@ split_documents = text_splitter.split_texts(documents)
 ### Build the vector database, 
 # DB has a default embedding model (OpenAI: text-embedding-3-small), Embedding dimension is 1536, context window is 8191
 vector_db = VectorDatabase()
-vector_db = asyncio.run(vector_db.abuild_from_list(split_documents))
+
+async def _build_vector_db():
+    return await vector_db.abuild_from_list(split_documents)
+
+try:
+    vector_db = asyncio.run(_build_vector_db())
+except RuntimeError:
+    loop = asyncio.get_event_loop()
+    vector_db = loop.run_until_complete(_build_vector_db())
+
 
 # TEST Query the vector database test
 # Embeds our query witht he same ebedding model, and loops through every vector in the DB and calculates cosine similarity to return top k closest vectors
