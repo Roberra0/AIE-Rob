@@ -5,3 +5,4 @@ numpy
 openai
 pdfplumber
 nest-asyncio
+python-dotenv
