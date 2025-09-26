@@ -196,7 +196,7 @@ class RetrievalAugmentedQAPipeline:
             }
         }
 
-
+## MAIN FUNCTION TO RUN THE RAG PIPELINE WITH A SAMPLE QUERY, ONLY RUNS WHEN THE SCRIPT IS RUN DIRECTLY, NOT WHEN IMPORTED AS A MODULE
 def main():
     """Main function to run the RAG pipeline"""
     # Initialize components
@@ -238,6 +238,33 @@ def main():
         print(f"{context[:800]}...")  # First 800 chars to see more of the chunk
         print(f"{'─'*60}")
         print()  # Extra blank line for separation
+
+### API Functions to create RAG pipeline and process query from API
+def create_rag_pipeline():
+    """Create and return a configured RAG pipeline instance"""
+    chat_openai = ChatOpenAI() 
+    rag_pipeline = RetrievalAugmentedQAPipeline(
+        vector_db_retriever=vector_db,
+        llm=chat_openai,
+        response_style="detailed",
+        include_scores=True
+    )
+    return rag_pipeline
+
+def process_query(query: str, k: int = 3):
+    """Process a single query using the RAG pipeline - can be imported by API"""
+    rag_pipeline = create_rag_pipeline()
+    
+    result = rag_pipeline.run_pipeline(
+        query,
+        k=k,
+        response_length="comprehensive", 
+        response_style="detailed",
+        include_warnings=True,
+        confidence_required=True
+    )
+    return result
+
 
 if __name__ == "__main__": # Calls the main function only when the script is run directly, not when imported as a module
     main()

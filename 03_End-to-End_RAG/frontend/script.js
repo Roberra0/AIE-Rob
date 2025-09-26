@@ -28,16 +28,26 @@ function handleSearch() {
     // Show loading state
     showLoading();
     
-    // Simulate API call delay
+    // We have the query, now we need to generate a response, after loading we will call the API
     setTimeout(() => {
-        const response = generateResponse(query);
-        showResults(response, query);
+        generateResponse(query).then(response => {
+            showResults(response, query);
+        }).catch(error => {
+            showError('Failed to fetch results from the backend.');
+            console.error('Error fetching response:', error);
+        });
     }, 1500);
 }
 
-// Generate a response based on the query
-function generateResponse(query) {
-    return demoResponse;
+// Call the API to generate a response
+async function generateResponse(query) {
+    const response = await fetch('http://localhost:8000/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: query })
+    });
+    const data = await response.json();
+    return data.response;
 }
 
 // Show loading state
@@ -61,9 +71,6 @@ function showResults(response, query) {
     resultContent.innerHTML = `
         <div class="response-display">
             ${response}
-        </div>
-        <div class="demo-notice">
-            <em>Note: This is a demo interface. In the full version, this would connect to your RAG pipeline to provide real answers from the apartment listings.</em>
         </div>
     `;
     
