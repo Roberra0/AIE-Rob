@@ -25,10 +25,7 @@ def cosine_similarity(vec_1, vec_2):
   return np.dot(vec_1, vec_2) / (norm(vec_1) * norm(vec_2))
 
 # Set up the OpenAI API key from the .env file
-with open('.env', 'r') as f:
-    line = f.read().strip()
-    if line.startswith('OPENAI_API_KEY='):
-        openai.api_key = line.split('=', 1)[1]
+openai.api_key = os.getenv('OPENAI_API_KEY')
 
 
 # Set up the embedding model
