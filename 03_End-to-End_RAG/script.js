@@ -41,7 +41,7 @@ function handleSearch() {
 
 // Call the API to generate a response
 async function generateResponse(query) {
-    const response = await fetch('/api/query', { // this is vercel expectation, if localhost use http://localhost:8000/query
+    const response = await fetch('/query', { // Use the same domain for deployed app
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ query: query })

@@ -2,6 +2,7 @@
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import sys
 import os
@@ -21,6 +22,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Mount static files (HTML, CSS, JS)
+app.mount("/static", StaticFiles(directory="."), name="static")
+
 class QueryRequest(BaseModel):
     query: str
 
@@ -34,6 +38,12 @@ class QueryResponse(BaseModel):
 @app.get("/")
 async def root():
     return {"message": "ApartmentSearch.ai API is running!"}
+
+@app.get("/app")
+async def serve_app():
+    """Serve the main application page"""
+    from fastapi.responses import FileResponse
+    return FileResponse("index.html")
 
 # Process the query from the API, then run our rag pipeline
 @app.post("/query", response_model=QueryResponse)
